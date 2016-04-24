@@ -41,21 +41,18 @@ def ReconnectMatch(Parents, Child):
     num_SNP_Pos = len(Child)
     num_Parents = Parents.shape[1]
     match_List = [0] * num_Parents
-    child_Homo_Count = 0
 
     for child_Allele in range(1,num_SNP_Pos):
-	if Child[child_Allele] != Het:
-	    child_Homo_Count += 1
-	    for parent_gen in range(0, num_Parents):
-		if Child[child_Allele] == Het:
-		    match_List[parent_gen] += 1
-		elif Child[child_Allele] == Parents[child_Allele, parent_gen]:
-		    match_List[parent_gen] += 1
+	for parent_gen in range(0, num_Parents):
+	    if Child[child_Allele] == Het:
+		match_List[parent_gen] += 1
+	    elif Child[child_Allele] == Parents[child_Allele, parent_gen]:
+		match_List[parent_gen] += 1
 
 
-    return match_List, child_Homo_Count, num_SNP_Pos
+    return match_List, num_SNP_Pos
 
-def Calculate_Likelihood_Ratios(match_List, child_Homo_Count, num_SNP_Pos, pMATCHRAND):
+def Calculate_Likelihood_Ratios(match_List, num_SNP_Pos, pMATCHRAND):
     likelihood_List = [0] * len(match_List)
 
     for parent_Idx in range(0, len(match_List)):
@@ -95,8 +92,8 @@ def get_P_Values(Parents, Child, match_List, num_SNP_Pos, allele_Frequencies, ma
     return parent_Match_PVal_List
 
 def main(Parents, Child, allele_Frequencies):
-    match_List, child_Homo_Count, num_SNP_Pos = ReconnectMatch(Parents, Child)
-    likelihood_List = Calculate_Likelihood_Ratios(match_List, child_Homo_Count, num_SNP_Pos, pMATCHRAND)
+    match_List, num_SNP_Pos = ReconnectMatch(Parents, Child)
+    likelihood_List = Calculate_Likelihood_Ratios(match_List, num_SNP_Pos, pMATCHRAND)
     parent_Match_Likelihood_List = find_Most_Likely(Parents, likelihood_List, match_List, max_Parents_Likelihood)
     parent_Match_PVal_List = get_P_Values(Parents, Child, match_List, num_SNP_Pos, allele_Frequencies, max_Parents_PVal)
 
